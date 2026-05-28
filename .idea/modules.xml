@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/spring-cloud-curso.iml" filepath="$PROJECT_DIR$/.idea/spring-cloud-curso.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/microservicio-spring-cloud.iml" filepath="$PROJECT_DIR$/.idea/spring-cloud-curso.iml" />
     </modules>
   </component>
 </project>
