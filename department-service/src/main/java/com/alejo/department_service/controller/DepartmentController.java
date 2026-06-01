@@ -3,6 +3,7 @@ package com.alejo.department_service.controller;
 
 import com.alejo.department_service.model.Department;
 import com.alejo.department_service.repository.DepartmentRepository;
+import com.alejo.department_service.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,34 +15,49 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@Slf4j
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/departments")
-
+@RequiredArgsConstructor
+@Slf4j
 public class DepartmentController {
 
-    private final DepartmentRepository departmentRepository;
+    private final DepartmentService departmentService;
 
+//    @RateLimiter(name = "department-service", fallbackMethod = "fallbackFindAllRateLimiter")
     @GetMapping
     public ResponseEntity<List<Department>> findAll() {
-        List<Department> departments = departmentRepository.findAll();
+        List<Department> departments = departmentService.findAll();
         return ResponseEntity.ok(departments);
     }
 
     @RequestMapping("/{id}")
     public ResponseEntity<Department> findById(@PathVariable Long id) {
-        Optional<Department> optionalDepartment = departmentRepository.findById(id);
+
+        Optional<Department> optionalDepartment = departmentService.findById(id);
+
         return optionalDepartment.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody Department department) {
-        departmentRepository.create(department);
+        departmentService.create(department);
         return ResponseEntity.ok().build();
     }
 
+//    @TimeLimiter(name = "department-service", fallbackMethod = "fallbackFindAllTimeLimiter")
+    @GetMapping("/async")
+    public CompletableFuture<ResponseEntity<List<Department>>> findAllAsync() {
+        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(departmentService.findAll()));
+    }
 
+    private ResponseEntity<List<Department>> fallbackFindAllRateLimiter(Throwable ex) {
+        log.error("Department service too many request {}", ex.getMessage());
+        return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+    }
 
+    private CompletableFuture<ResponseEntity<List<Department>>> fallbackFindAllTimeLimiter(Throwable ex) {
+        log.error("Department service time limite {}", ex.getMessage());
+        return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT));
+    }
 
 }
