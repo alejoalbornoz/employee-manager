@@ -4,6 +4,7 @@ package com.alejo.department_service.controller;
 import com.alejo.department_service.model.Department;
 import com.alejo.department_service.repository.DepartmentRepository;
 import com.alejo.department_service.service.DepartmentService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
-//    @RateLimiter(name = "department-service", fallbackMethod = "fallbackFindAllRateLimiter")
+    @RateLimiter(name = "department-service", fallbackMethod = "fallbackFindAllRateLimiter")
     @GetMapping
     public ResponseEntity<List<Department>> findAll() {
         List<Department> departments = departmentService.findAll();
