@@ -5,6 +5,7 @@ import com.alejo.department_service.model.Department;
 import com.alejo.department_service.repository.DepartmentRepository;
 import com.alejo.department_service.service.DepartmentService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class DepartmentController {
         return ResponseEntity.ok().build();
     }
 
-//    @TimeLimiter(name = "department-service", fallbackMethod = "fallbackFindAllTimeLimiter")
+    @TimeLimiter(name = "department-service", fallbackMethod = "fallbackFindAllTimeLimiter")
     @GetMapping("/async")
     public CompletableFuture<ResponseEntity<List<Department>>> findAllAsync() {
         return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(departmentService.findAll()));
